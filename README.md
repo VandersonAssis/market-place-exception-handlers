@@ -7,4 +7,4 @@ interviewers my abilities creating a system using microservices architecture.
 
 Also, please have in mind that 
 I work in this project only on my free time, therefore, new features, bug corrections and improvements can take 
-a little while.
+a little while to be addressed.
