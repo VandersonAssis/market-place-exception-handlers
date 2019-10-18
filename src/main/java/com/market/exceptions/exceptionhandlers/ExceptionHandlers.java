@@ -1,5 +1,7 @@
 package com.market.exceptions.exceptionhandlers;
 
+import com.market.exceptions.custom.ResourceNotFoundException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.stream.Collectors;
@@ -27,15 +31,26 @@ public class ExceptionHandlers extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ApiError(BAD_REQUEST, "Malformed request", ex.getMessage()), BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = { RuntimeException.class } )
-    protected  ResponseEntity<Object> handleInternalServerErrorException(RuntimeException ex, WebRequest request) {
-        String message = "Internal server error. A more meaningful log has been forwarded to our team.";
-        return handleExceptionInternal(ex, message, new HttpHeaders(), INTERNAL_SERVER_ERROR, request);
+    @Override
+    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return this.handleResourceNotFoundException();
     }
 
-    @ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class })
-    protected ResponseEntity<Object> handleConflictException(RuntimeException ex, WebRequest request) {
-        String message = "Conflict exception happened. This register is already in our database.";
-        return handleExceptionInternal(ex, message, new HttpHeaders(), CONFLICT, request);
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    protected ResponseEntity<Object> handleResourceNotFoundException() {
+        String message = "The resource requested was not found.";
+        return new ResponseEntity<>(new ApiError(NOT_FOUND, message), NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = RuntimeException.class)
+    protected  ResponseEntity<Object> handleInternalServerErrorException(RuntimeException ex, WebRequest request) {
+        String message = "Internal server error. A more meaningful log has been forwarded to our team.";
+        return new ResponseEntity<>(new ApiError(INTERNAL_SERVER_ERROR, message, ex.getMessage()), INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = DuplicateKeyException.class)
+    protected ResponseEntity<Object> handleConflictException(DuplicateKeyException ex, WebRequest request) {
+        String message = "This record is already in the database.";
+        return new ResponseEntity<>(new ApiError(CONFLICT, message), CONFLICT);
     }
 }
