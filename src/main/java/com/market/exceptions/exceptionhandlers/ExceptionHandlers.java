@@ -45,7 +45,7 @@ public class ExceptionHandlers extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class)
     protected  ResponseEntity<Object> handleInternalServerErrorException(RuntimeException ex, WebRequest request) {
         String message = "Internal server error. A more meaningful log has been forwarded to our team.";
-        return new ResponseEntity<>(new ApiError(INTERNAL_SERVER_ERROR, message, ex.getMessage()), INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ApiError(INTERNAL_SERVER_ERROR, message), INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = DuplicateKeyException.class)
