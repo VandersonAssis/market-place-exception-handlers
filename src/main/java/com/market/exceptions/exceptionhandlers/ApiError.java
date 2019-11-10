@@ -9,19 +9,19 @@ import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class ApiError {
+public class ApiError {
     private HttpStatus status;
     private String message;
     private List<String> errors;
 
-    ApiError(HttpStatus status, String message, String error) {
+    public ApiError(HttpStatus status, String message, String error) {
         super();
         this.status = status;
         this.message = message;
         errors = Collections.singletonList(error);
     }
 
-    ApiError(HttpStatus status, String message) {
+    public ApiError(HttpStatus status, String message) {
         super();
         this.status = status;
         this.message = message;
