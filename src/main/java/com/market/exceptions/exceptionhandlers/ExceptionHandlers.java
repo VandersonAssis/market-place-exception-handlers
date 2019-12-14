@@ -1,6 +1,6 @@
 package com.market.exceptions.exceptionhandlers;
 
-import com.market.exceptions.custom.ResourceNotFoundException;
+import com.market.exceptions.custom.BaseHttpException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.stream.Collectors;
@@ -33,13 +32,13 @@ public class ExceptionHandlers extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return this.handleResourceNotFoundException();
-    }
-
-    @ExceptionHandler(value = ResourceNotFoundException.class)
-    protected ResponseEntity<Object> handleResourceNotFoundException() {
         String message = "The resource requested was not found.";
         return new ResponseEntity<>(new ApiError(NOT_FOUND, message), NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = BaseHttpException.class)
+    protected ResponseEntity<Object> handleCustomBaseHttpException(BaseHttpException ex) {
+        return new ResponseEntity<>(ex.getApiError(), ex.getApiError().getStatus());
     }
 
     @ExceptionHandler(value = RuntimeException.class)
